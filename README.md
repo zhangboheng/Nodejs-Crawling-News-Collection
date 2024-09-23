@@ -97,7 +97,7 @@ async function scrapeData() {
 }
 ```
 
-By modifying the `options` object and the `extractData` function, you can customize the crawling process and data extraction logic to suit your specific needs.
+By modifying the `options` object and the `scrapeData` function, you can customize the crawling process and data extraction logic to suit your specific needs.
 
 ### Conclusion
 The Nodejs Crawling News Collection project provides a convenient way to crawl and collect news data from various websites. By customizing the crawling options and data extraction logic, you can easily adapt the project to your requirements and extract the information you need.
