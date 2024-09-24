@@ -96,12 +96,23 @@ async function saveToFile() {
     const timeString = currentDate.toTimeString().split(' ')[0];
     const content = `<h1>News Collection</h1><h4 style="margin-bottom:10px;">Total：${selectArr.size}  Update：${timeString}</h4>` + Array.from(selectArr).reverse().join("");
     
-    fs.writeFileSync(`news_list.html`, content, { encoding: 'utf8' });
+    fs.writeFileSync(`${tdays}.html`, content, { encoding: 'utf8' });
 }
 
-async function main() {
+setInterval(async () => {
     await scrapeData();
     await saveToFile();
-}
+}, 5000);
 
-main().catch(console.error);
+http.createServer(async (req, res) => {
+    fs.readFile(`${tdays}.html`, (err, data) => {
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        if (err) {
+            res.end('Error loading page');
+            return;
+        }
+        res.end(data);
+    });
+}).listen(43219, () => {
+    console.log('Server running at http://localhost:43219/');
+});
