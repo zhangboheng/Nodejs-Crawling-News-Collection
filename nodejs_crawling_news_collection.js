@@ -98,3 +98,10 @@ async function saveToFile() {
     
     fs.writeFileSync(`news_list.html`, content, { encoding: 'utf8' });
 }
+
+async function main() {
+    await scrapeData();
+    await saveToFile();
+}
+
+main().catch(console.error);
