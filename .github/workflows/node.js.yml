@@ -3,7 +3,7 @@ name: Deploy Node.js Project
 on:
   push:
     branches:
-      - main  # 你要监听的分支
+      - main
 
 jobs:
   build:
