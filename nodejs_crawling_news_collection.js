@@ -98,21 +98,3 @@ async function saveToFile() {
     
     fs.writeFileSync(`${tdays}.html`, content, { encoding: 'utf8' });
 }
-
-setInterval(async () => {
-    await scrapeData();
-    await saveToFile();
-}, 5000);
-
-http.createServer(async (req, res) => {
-    fs.readFile(`${tdays}.html`, (err, data) => {
-        res.setHeader("Content-Type", "text/html; charset=utf-8");
-        if (err) {
-            res.end('Error loading page');
-            return;
-        }
-        res.end(data);
-    });
-}).listen(43219, () => {
-    console.log('Server running at http://localhost:43219/');
-});
