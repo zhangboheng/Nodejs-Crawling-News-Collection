@@ -1,0 +1,17 @@
+{
+  "name": "nodejs-crawling-news-collection",
+  "version": "1.0.0",
+  "description": "A Node.js project for crawling news from various sources.",
+  "main": "nodejs_crawling_news_collection.js",
+  "scripts": {
+    "start": "node nodejs_crawling_news_collection.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "http": "0.0.1-security",
+    "request-promise": "^4.2.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
