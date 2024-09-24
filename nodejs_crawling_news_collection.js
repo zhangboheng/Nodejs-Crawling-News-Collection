@@ -50,11 +50,12 @@ async function fetchData(url, headers) {
 }
 
 async function scrapeData() {
+    selectArr.clear(); // 清空选择数组以便重新填充
     const cnnData = await fetchData(options.cnn.uri, options.cnn.headers);
     if (cnnData) {
         const $ = cheerio.load(cnnData);
         $('.tabcontent ul li a').each(function() {
-            selectArr.add(`<a href="${$(this).attr('href')}"><li><span>【CNN】</span>${$(this).text()}</li></a>`);
+            selectArr.add(`<a href="${options.cnn.uri.slice(0, -3) + $(this).attr('href')}" target="_blank"><li><span>【CNN】</span>${$(this).text()}</li></a>`);
         });
     }
 
@@ -62,7 +63,7 @@ async function scrapeData() {
     if (pornhubData) {
         const $ = cheerio.load(pornhubData);
         $('.title a').each(function() {
-            selectArr.add(`<a href="${$(this).attr('href')}"><li><span>【Pornhub】</span>${$(this).text()}</li></a>`);
+            selectArr.add(`<a href="${options.pornhub.uri.slice(0, -1) + $(this).attr('href')}"><li><span>【Pornhub】</span>${$(this).text()}</li></a>`);
         });
     }
 
@@ -70,7 +71,7 @@ async function scrapeData() {
     if (sohuData) {
         const $ = cheerio.load(sohuData);
         $('#block4 a').each(function() {
-            selectArr.add(`<a href="${$(this).attr('href')}"><li><span>【Sohu】</span>${$(this).text()}</li></a>`);
+            selectArr.add(`<a href="${$(this).attr('href').indexOf("sohu.com") > -1 ? $(this).attr('href') : options.sohu.uri.slice(0, -1) + $(this).attr('href')}" target="_blank"><li><span>【Sohu】</span>${$(this).text()}</li></a>`);
         });
     }
 
@@ -78,7 +79,7 @@ async function scrapeData() {
     if (neteaseData) {
         const $ = cheerio.load(neteaseData);
         $('.tab_content h2 a, .topnews_nlist2 h3 a').each(function() {
-            selectArr.add(`<a href="${$(this).attr('href')}"><li><span>【Neetease】</span>${$(this).text()}</li></a>`);
+            selectArr.add(`<a href="${$(this).attr('href')}" target="_blank"><li><span>【Netease】</span>${$(this).text()}</li></a>`);
         });
     }
 
@@ -86,7 +87,7 @@ async function scrapeData() {
     if (tencentData) {
         const data = JSON.parse(tencentData);
         data.data.list.forEach(item => {
-            selectArr.add(`<a href="${item.url}"><li><span>【Tencent】</span>${item.title}</li></a>`);
+            selectArr.add(`<a href="${item.url}" target="_blank"><li><span>【Tencent】</span>${item.title}</li></a>`);
         });
     }
 }
@@ -94,25 +95,47 @@ async function scrapeData() {
 async function saveToFile() {
     const currentDate = new Date();
     const timeString = currentDate.toTimeString().split(' ')[0];
-    const content = `<h1>News Collection</h1><h4 style="margin-bottom:10px;">Total：${selectArr.size}  Update：${timeString}</h4>` + Array.from(selectArr).reverse().join("");
+    const content = `
+        <html>
+        <head>
+            <style>
+                body { transition: background-color 0.3s, color 0.3s; margin: 10px; }
+                h1 { margin: 0 auto; text-align: center; }
+                .header { display: flex; justify-content: space-between; align-items: center; }
+                .dark-mode { background-color: #121212; color: #ffffff; }
+                .dark-mode a { color: #ffffff; }
+            </style>
+        </head>
+        <body>
+            <h1>News Collection</h1>
+            <div class="header">
+                <h4 style="margin-bottom:10px;">Total：${selectArr.size}  Update：${timeString}</h4>
+                <button id="darkModeToggle">Dark Mode</button>
+            </div>
+            <ul>${Array.from(selectArr).join("")}</ul>
+            <script>
+                document.getElementById('darkModeToggle').addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+                });
+            </script>
+        </body>
+        </html>
+    `;
     
     fs.writeFileSync(`${tdays}.html`, content, { encoding: 'utf8' });
 }
 
-setInterval(async () => {
-    await scrapeData();
-    await saveToFile();
-}, 5000);
-
 http.createServer(async (req, res) => {
-    fs.readFile(`${tdays}.html`, (err, data) => {
-        res.setHeader("Content-Type", "text/html; charset=utf-8");
-        if (err) {
-            res.end('Error loading page');
-            return;
-        }
-        res.end(data);
-    });
+        await scrapeData();
+        await saveToFile();
+        fs.readFile(`${tdays}.html`, (err, data) => {
+            res.setHeader("Content-Type", "text/html; charset=utf-8");
+            if (err) {
+                res.end('Error loading page');
+                return;
+            }
+            res.end(data);
+        });
 }).listen(43219, () => {
     console.log('Server running at http://localhost:43219/');
 });
