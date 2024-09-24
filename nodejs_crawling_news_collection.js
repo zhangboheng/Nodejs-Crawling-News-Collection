@@ -96,5 +96,5 @@ async function saveToFile() {
     const timeString = currentDate.toTimeString().split(' ')[0];
     const content = `<h1>News Collection</h1><h4 style="margin-bottom:10px;">Total：${selectArr.size}  Update：${timeString}</h4>` + Array.from(selectArr).reverse().join("");
     
-    fs.writeFileSync(`${tdays}.html`, content, { encoding: 'utf8' });
+    fs.writeFileSync(`news_list.html`, content, { encoding: 'utf8' });
 }
